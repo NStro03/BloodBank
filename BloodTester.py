@@ -45,7 +45,7 @@ def TestBlood():
         print("No Blood units left to test. Enjoy your day in cafeteria!")
         return
     with open('BloodUnits.csv', 'w') as s:
-        fieldnames = ["DONOR_ID", "BLOOD_GROUP", "TESTED", "STATUS"]
+        fieldnames = ["DONOR_ID", "BLOOD_GROUP", "UNIT_COUNT", "TESTED", "STATUS"]
         writer = csv.DictWriter(s, fieldnames=fieldnames)
         writer.writeheader()
         for i in BloodUnits:
