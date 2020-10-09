@@ -38,9 +38,6 @@ def newUser(name):
 
 def existingUser(id):
     print("RESPECT THE LORD!!")
-    while(True):
-        inp = int(input("What do you want to do :\n\t1. Donate Blood\n\t2. Request Blood\n\t0. Logout\n"
-                        "Make your choice: "))
 
 
 def staff():
