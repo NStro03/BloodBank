@@ -1,8 +1,10 @@
 import csv
 import copy
 import StockManagement as st
+import Payment as pt
+
 Blood_groups=['A+','B+','AB+','O+','A-','B-','AB-','O-']
-def donate(current_user):
+def donate(current_user): #TODO implement blacklist condition
     print("donated")
     temp=int(input("Enter no. of units you want to donate : "))
     blood_group=input("Enter your blood group : ")
@@ -34,6 +36,7 @@ def donate(current_user):
             # print(i)
             writer.writerow(i)
 
+    current_user["DONATED_UNITS"]=str((int(current_user["DONATED_UNITS"]))+temp)
     print("Your sample has been collected,once the blood test is done if accepted then reflect in your account")
 
 def request(current_user):
@@ -56,11 +59,22 @@ def request(current_user):
     if requested <= free_units:
         st.DebitUnits(blood_grp,requested)
         x=(int(current_user["REQUESTED_UNITS"])+requested)
-        current_user["REQUESTED_UNITS"]=""+x
+        current_user["REQUESTED_UNITS"]=str(x)
+        print("Due to your previous donations to the bank,the requested blood units have been allotted to you for free")
     else:
         y_n=input("Would you like to purchase the blood units ? Y/N\n")
         if y_n=='Y' or y_n=='y':
-
+            payable_units=requested-free_units
+            pay_status=pt.makePayment(payable_units,blood_grp)
+            if  not pay_status:
+                print("payment unsuccessful.\nPlease make request again")
+                return
+            x = (int(current_user["REQUESTED_UNITS"]) + free_units)
+            current_user["REQUESTED_UNITS"] = str(x)
+            print("Payment success")
+            st.DebitUnits(blood_grp,requested)
+        else:
+            print("bye bye.\nBring money next time")
 
 
 def logout():
@@ -70,10 +84,11 @@ def customer():
     id =""+input("please enter your userid to login : ")
     current_user=None
 
-
+    users=[]
     with open('UserData.csv')as s:
         reader = csv.DictReader(s)
         for row in reader:
+            users.append(copy.deepcopy(row))
             if row["ID"]==id:
                 current_user=copy.deepcopy(row)
                 break
@@ -95,6 +110,18 @@ def customer():
 
         func=switcher.get(inp,lambda : "enter valid input")
         func(current_user)
+        for i in range(len(users)):
+            if current_user["ID"]==users[i]["ID"]:
+                users[i]=copy.deepcopy(current_user)
+
+        with open('UserData.csv', 'w') as s:
+            fieldnames = ["ID", "NAME", "DONATED_UNITS", "REQUESTED_UNITS", "STATUS"]
+            writer = csv.DictWriter(s, fieldnames=fieldnames)
+            writer.writeheader()
+            for j in users:
+                # print(i)
+                writer.writerow(j)
+
 
 
 
