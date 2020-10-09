@@ -1,28 +1,48 @@
-
-
-Stock={'Apos':5,'Bpos':8,'ABpos':5,'Opos':12,'Aneg':32,'ABneg':23,'Oneg':10,'Bneg':13}
+import copy
+import csv
+import numpy as np
+import pandas as pd
 
 
 
 def stockDetails():
-    for i,v in Stock.items():
-        print(i,v)
+    with open('stock_management.csv')as s:
+        reader = csv.DictReader(s)
+        for row in reader:
+            temp = copy.deepcopy(row)
+            # for k, v in row.items():
+            #     print(k, v)
+        return temp
 
 
-def creditUnits(blood,x):
-    for i,v in Stock.items():
-        if(i==blood):
-            Stock[i]+=x
+def creditUnits(blood, x):
+    current_stock=stockDetails()
+    t=int(current_stock[blood])+x
+    current_stock[blood]="{}".format(t)
+    with open('stock_management.csv', 'w')as s:
+        fieldnames=['A+','B+','AB+','O+','A-','B-','AB-','O-']
+        writer = csv.DictWriter(s,fieldnames=fieldnames)
+        writer.writeheader()
+        writer.writerow(current_stock)
 
 def DebitUnits(blood,x):
-    for i,v in Stock.items():
-        if(i==blood):
-            if(Stock[i]<x):
-                print("stock is less than the demanded")
-            else:
-                Stock[i]-=x
+    current_data=stockDetails()
 
+    if(int(current_data[blood])<x):
+        print("stock is less than the demanded")
+        return
+    t = int(current_data[blood]) - x
+    current_data[blood] = "{}".format(t)
+    with open('stock_management.csv', 'w')as s:
+        fieldnames = ['A+', 'B+', 'AB+', 'O+', 'A-', 'B-', 'AB-', 'O-']
+        writer = csv.DictWriter(s, fieldnames=fieldnames)
+        writer.writeheader()
+        writer.writerow(current_data)
 
-creditUnits('Apos',10)
-DebitUnits('Aneg',22)
-stockDetails()
+print(stockDetails())
+
+creditUnits('A+',10)
+print(stockDetails())
+
+DebitUnits('B+',5)
+print(stockDetails())
