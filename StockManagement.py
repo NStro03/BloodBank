@@ -39,10 +39,12 @@ def DebitUnits(blood,x):
         writer.writeheader()
         writer.writerow(current_data)
 
-print(stockDetails())
 
-creditUnits('A+',10)
-print(stockDetails())
+if __name__=="__main__":
+    print(stockDetails())
 
-DebitUnits('B+',5)
-print(stockDetails())
+    creditUnits('A+',10)
+    print(stockDetails())
+
+    DebitUnits('B+',5)
+    print(stockDetails())
