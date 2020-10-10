@@ -6,7 +6,7 @@ import Payment as pt
 Blood_groups=['A+','B+','AB+','O+','A-','B-','AB-','O-']
 def donate(current_user): #TODO implement loop in main
 
-    if current_user["STATUS"]=="blacklist":
+    if current_user["STATUS"]=="blacklisted":
         print("Due to an incurable disease in your blood, you have been barred from donating blood\n You may continue "
               "to request blood from our blood bank in the future.")
         return
@@ -25,7 +25,6 @@ def donate(current_user): #TODO implement loop in main
                    }
     with open("BloodUnits.csv") as bu:
         reader = csv.DictReader(bu)
-        i = 0
         BloodUnits = []
         for row in reader:
             BloodUnits.append(copy.deepcopy(row))

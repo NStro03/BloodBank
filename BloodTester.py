@@ -1,30 +1,8 @@
 import csv
 import copy
 
-# TotalBloodCount = 2
-# BloodDataTemplate={
-#     "donorID": None,
-#     "group": None,
-#     "tested": False,
-#     "status": None
-# }
-#
-# BloodUnits = [
-#     {
-#         "donorID":"1",
-#         "group":"B+",
-#         "tested": False,
-#         "status": None
-#     },
-#     {
-#         "donorID":"3",
-#         "group": "O+",
-#         "tested": False,
-#         "status": None
-#     }
-# ]
 
-def TestBlood():
+def testBlood():
     with open("BloodUnits.csv") as bu:
         reader = csv.DictReader(bu)
         i = 0
@@ -56,6 +34,6 @@ def TestBlood():
 
 
 if __name__ == "__main__":
-    TestBlood()
+    testBlood()
     # print(BloodUnits[0]["tested"])
 
