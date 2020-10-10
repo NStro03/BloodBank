@@ -4,8 +4,12 @@ import StockManagement as st
 import Payment as pt
 
 Blood_groups=['A+','B+','AB+','O+','A-','B-','AB-','O-']
-def donate(current_user): #TODO implement blacklist condition
-    print("donated")
+def donate(current_user): #TODO implement loop in main
+
+    if current_user["STATUS"]=="blacklist":
+        print("Due to an incurable disease in your blood, you have been barred from donating blood\n You may continue "
+              "to request blood from our blood bank in the future.")
+        return
     temp=int(input("Enter no. of units you want to donate : "))
     blood_group=input("Enter your blood group : ")
     if not blood_group in Blood_groups:
@@ -40,7 +44,7 @@ def donate(current_user): #TODO implement blacklist condition
     print("Your sample has been collected,once the blood test is done if accepted then reflect in your account")
 
 def request(current_user):
-    print("requested")
+
     blood_grp=input("Which blood group you want ? ")
 
     if not blood_grp in Blood_groups:
