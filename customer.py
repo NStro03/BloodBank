@@ -4,7 +4,7 @@ import SupplyBlood as sb
 Blood_groups = ['A+', 'B+', 'AB+', 'O+', 'A-', 'B-', 'AB-', 'O-']
 
 
-def donate(current_user): #TODO implement loop in main
+def donate(current_user):
 
     if current_user["STATUS"] == "blacklisted":
         print("Due to an incurable disease in your blood, you have been barred from donating blood\n You may continue "
@@ -17,11 +17,11 @@ def donate(current_user): #TODO implement loop in main
               " we will let you know")
         return
     Donated_blood={
-                   'DONOR_ID':current_user["ID"],
-                   'BLOOD_GROUP':blood_group,
-                   'UNIT_COUNT':temp,
-                   'TESTED':"FALSE",
-                   'STATUS':"None"
+                   'DONOR_ID': current_user["ID"],
+                   'BLOOD_GROUP': blood_group,
+                   'UNIT_COUNT': temp,
+                   'TESTED': "FALSE",
+                   'STATUS': "None"
                    }
     with open("BloodUnits.csv") as bu:
         reader = csv.DictReader(bu)
@@ -39,7 +39,6 @@ def donate(current_user): #TODO implement loop in main
             # print(i)
             writer.writerow(i)
 
-    current_user["DONATED_UNITS"]=str((int(current_user["DONATED_UNITS"]))+temp)
     print("Your sample has been collected,once the blood test is done if accepted then reflect in your account")
 
 
@@ -53,38 +52,6 @@ def request(current_user):
 
     requested = int(input("Enter no. of blood units you wanted : "))
     sb.supply(blood_grp, requested, current_user)
-
-    # Instock=st.stockDetails()
-    #
-    # if int(Instock[blood_grp]) < requested:
-    #     print("We currently have {0} units of {1} available with us so we cannot fulfill your request".format(Instock[blood_grp],blood_grp))
-    #     return
-    #
-    # free_units=int(current_user["DONATED_UNITS"])-int(current_user["REQUESTED_UNITS"])
-    #
-    # if requested <= free_units:
-    #     st.DebitUnits(blood_grp,requested)
-    #     x=(int(current_user["REQUESTED_UNITS"])+requested)
-    #     current_user["REQUESTED_UNITS"]=str(x)
-    #     print("Due to your previous donations to the bank,the requested blood units have been allotted to you for free")
-    # else:
-    #     y_n=input("Would you like to purchase the blood units ? Y/N\n")
-    #     if y_n=='Y' or y_n=='y':
-    #         payable_units=requested-free_units
-    #         pay_status=pt.makePayment(payable_units,blood_grp)
-    #         if  not pay_status:
-    #             print("payment unsuccessful.\nPlease make request again")
-    #             return
-    #         x = (int(current_user["REQUESTED_UNITS"]) + free_units)
-    #         current_user["REQUESTED_UNITS"] = str(x)
-    #         print("Payment success")
-    #         st.DebitUnits(blood_grp,requested)
-    #     else:
-    #         print("bye bye.\nBring money next time")
-
-
-def logout():
-    return
 
 
 def customer():
@@ -111,7 +78,7 @@ def customer():
         }
         inp = int(input("What do you want to do :\n\t1. Donate Blood\n\t2. Request Blood\n\t0. Logout\n"
                         "Make your choice: "))
-        if inp==0:
+        if inp == 0:
             return
 
         func = switcher.get(inp, lambda: "enter valid input")

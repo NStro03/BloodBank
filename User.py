@@ -3,8 +3,9 @@ import copy
 import staff
 import customer
 
-def newUser(name):
+def newUser():
     print("Noob DETECTED!!")
+    name = input("Please enter your name: ")
     userTemplate = {
         "ID": "",
         "NAME": "",
@@ -50,6 +51,6 @@ def existingUser():
 
 
 if __name__ == '__main__':
-    # newUser("Sudeep")
+    # newUser()
     existingUser()
 
