@@ -1,13 +1,13 @@
 import csv
 import copy
-import AcceptBlood
+from modules import AcceptBlood
 
 
 def staff():
     id = input("Please enter your Employee ID: ")
     employees = []
     current_staff = None
-    with open("StaffData.csv") as e:
+    with open("database/StaffData.csv") as e:
         reader = csv.DictReader(e)
         for row in reader:
             employees.append(copy.deepcopy(row))
@@ -35,7 +35,7 @@ def staff():
             if current_staff["ID"] == employees[i]["ID"]:
                 employees[i] = copy.deepcopy(current_staff)
 
-        with open('StaffData.csv', 'w') as s:
+        with open('database/StaffData.csv', 'w') as s:
             fieldnames = ["ID", "NAME", "ACCEPTED_UNITS", "REJECTED_UNITS"]
             writer = csv.DictWriter(s, fieldnames=fieldnames)
             writer.writeheader()

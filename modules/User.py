@@ -1,7 +1,7 @@
 import csv
 import copy
-import staff
-import customer
+from modules import customer, staff
+
 
 def newUser():
     print("Noob DETECTED!!")
@@ -13,7 +13,7 @@ def newUser():
         "REQUESTED_UNITS": "0",
         "STATUS": "None"
     }
-    with open("UserData.csv") as ud:
+    with open("database/UserData.csv") as ud:
         reader = csv.DictReader(ud)
         i = 0
         Users = []
@@ -26,7 +26,7 @@ def newUser():
 
     Users.append(userTemplate)
 
-    with open('UserData.csv', 'w') as s:
+    with open('database/UserData.csv', 'w') as s:
         fieldnames = ["ID", "NAME", "DONATED_UNITS", "REQUESTED_UNITS", "STATUS"]
         writer = csv.DictWriter(s, fieldnames=fieldnames)
         writer.writeheader()
@@ -39,7 +39,7 @@ def newUser():
 
 
 def existingUser():
-    print("RESPECT THE LORD!!")
+    print("SALUTATION TO MY LORD!!")
     switcher = {
         1: customer.customer,
         2: staff.staff

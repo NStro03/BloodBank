@@ -1,4 +1,4 @@
-import User as u
+from modules import User as u
 
 
 def exitSystem():

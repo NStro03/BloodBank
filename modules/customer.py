@@ -1,6 +1,7 @@
 import csv
 import copy
-import SupplyBlood as sb
+from modules import SupplyBlood as sb
+
 Blood_groups = ['A+', 'B+', 'AB+', 'O+', 'A-', 'B-', 'AB-', 'O-']
 
 
@@ -23,7 +24,7 @@ def donate(current_user):
                    'TESTED': "FALSE",
                    'STATUS': "None"
                    }
-    with open("BloodUnits.csv") as bu:
+    with open("database/BloodUnits.csv") as bu:
         reader = csv.DictReader(bu)
         BloodUnits = []
         for row in reader:
@@ -31,7 +32,7 @@ def donate(current_user):
 
     BloodUnits.append(Donated_blood)
 
-    with open('BloodUnits.csv', 'w') as s:
+    with open('database/BloodUnits.csv', 'w') as s:
         fieldnames = ["DONOR_ID", "BLOOD_GROUP", "UNIT_COUNT", "TESTED", "STATUS"]
         writer = csv.DictWriter(s, fieldnames=fieldnames)
         writer.writeheader()
@@ -59,7 +60,7 @@ def customer():
     current_user=None
 
     users = []
-    with open('UserData.csv')as s:
+    with open('database/UserData.csv')as s:
         reader = csv.DictReader(s)
         for row in reader:
             users.append(copy.deepcopy(row))
@@ -87,7 +88,7 @@ def customer():
             if current_user["ID"] == users[i]["ID"]:
                 users[i] = copy.deepcopy(current_user)
 
-        with open('UserData.csv', 'w') as s:
+        with open('database/UserData.csv', 'w') as s:
             fieldnames = ["ID", "NAME", "DONATED_UNITS", "REQUESTED_UNITS", "STATUS"]
             writer = csv.DictWriter(s, fieldnames=fieldnames)
             writer.writeheader()

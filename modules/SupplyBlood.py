@@ -1,5 +1,4 @@
-import StockManagement as st
-import Payment as pt
+from modules import Payment as pt, StockManagement as st
 
 
 def supply(blood_grp, requested, current_user):

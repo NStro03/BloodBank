@@ -1,4 +1,4 @@
-import BloodTester as BT
+from modules import BloodTester as BT
 import csv
 import copy
 
@@ -10,12 +10,12 @@ def acceptBlood(curr_staff):
     error_units = []
     Users = []
     i = 0
-    with open("UserData.csv") as ud:
+    with open("database/UserData.csv") as ud:
         reader = csv.DictReader(ud)
         for row in reader:
             Users.append(copy.deepcopy(row))
 
-    with open("BloodUnits.csv") as bu:
+    with open("database/BloodUnits.csv") as bu:
         reader = csv.DictReader(bu)
         for row in reader:
             i += 1
@@ -58,7 +58,7 @@ def acceptBlood(curr_staff):
                             row["DONOR_ID"]))
             BloodUnits.append(copy.deepcopy(row))
 
-    with open('UserData.csv', 'w') as s:
+    with open('database/UserData.csv', 'w') as s:
         fieldnames = ["ID", "NAME", "DONATED_UNITS", "REQUESTED_UNITS", "STATUS"]
         writer = csv.DictWriter(s, fieldnames=fieldnames)
         writer.writeheader()
@@ -66,7 +66,7 @@ def acceptBlood(curr_staff):
             writer.writerow(j)
 
     i = 0
-    with open('BloodUnits.csv', 'w') as s:
+    with open('database/BloodUnits.csv', 'w') as s:
         fieldnames = ["DONOR_ID", "BLOOD_GROUP", "UNIT_COUNT", "TESTED", "STATUS"]
         writer = csv.DictWriter(s, fieldnames=fieldnames)
         writer.writeheader()

@@ -3,7 +3,7 @@ import copy
 
 
 def testBlood():
-    with open("BloodUnits.csv") as bu:
+    with open("database/BloodUnits.csv") as bu:
         reader = csv.DictReader(bu)
         i = 0
         BloodUnits = []
@@ -22,7 +22,7 @@ def testBlood():
     if not found:
         print("No Blood units left to test. Enjoy your day in cafeteria!")
         return
-    with open('BloodUnits.csv', 'w') as s:
+    with open('database/BloodUnits.csv', 'w') as s:
         fieldnames = ["DONOR_ID", "BLOOD_GROUP", "UNIT_COUNT", "TESTED", "STATUS"]
         writer = csv.DictWriter(s, fieldnames=fieldnames)
         writer.writeheader()
