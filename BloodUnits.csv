@@ -1,4 +1,5 @@
 DONOR_ID,BLOOD_GROUP,UNIT_COUNT,TESTED,STATUS
-3,AB+,2,FALSE,babaji ki booti
 3,A-,2,FALSE,None
 3,AB-,4,FALSE,None
+1,B+,2,FALSE,None
+2,B-,1,FALSE,None

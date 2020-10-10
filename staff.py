@@ -13,7 +13,6 @@ def staff():
             employees.append(copy.deepcopy(row))
             if row["ID"] == id:
                 current_staff = copy.deepcopy(row)
-                break
 
     if current_staff is None:
         print("User doesn't exist!!\nEnter a valid user ID or Contact Admin.")

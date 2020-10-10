@@ -63,7 +63,6 @@ def acceptBlood(curr_staff):
         writer = csv.DictWriter(s, fieldnames=fieldnames)
         writer.writeheader()
         for j in Users:
-            # print(i)
             writer.writerow(j)
 
     i = 0

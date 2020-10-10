@@ -1,6 +1,7 @@
 import csv
 import copy
-
+import staff
+import customer
 
 def newUser(name):
     print("Noob DETECTED!!")
@@ -36,16 +37,19 @@ def newUser(name):
           "our system.\n\tUser ID: {1}".format(name, userTemplate["ID"]))
 
 
-def existingUser(id):
+def existingUser():
     print("RESPECT THE LORD!!")
-
-
-def staff():
-    while(True):
-        inp = int(
-            input("What do you want to do :\n\t1. Test Blood\n\t0. Logout\nMake your choice: "))
+    switcher = {
+        1: customer.customer,
+        2: staff.staff
+    }
+    inp = int(input("Are you \n\t1. Customer\n\t2. Staff\n"
+                    "Make your choice: "))
+    func = switcher.get(inp, lambda: "enter valid input")
+    func()
 
 
 if __name__ == '__main__':
-    newUser("Sudeep")
+    # newUser("Sudeep")
+    existingUser()
 
