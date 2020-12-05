@@ -1,0 +1,1 @@
+This BloodBank tool is based on OOP implementation.
