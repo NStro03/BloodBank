@@ -5,47 +5,15 @@ import copy
 class User:
 
     __name = None
-    __age = None
-    __phoneNumber = None
-    __gender = None
-    __bloodGroup = None
 
-    def __init__(self, name, age, phno, gender, bgrp):
+    def __init__(self, name):
         self.__name = name
-        self.__age = age
-        self.__phoneNumber = phno
-        self.__gender = gender
-        self.__bloodGroup = bgrp
 
     def getName(self):
         return self.__name
 
     def setName(self, name):
         self.__name = name
-
-    def getAge(self):
-        return self.__age
-
-    def setAge(self, age):
-        self.__age = age
-
-    def getPhNumber(self):
-        return self.__phoneNumber
-
-    def setPhNumber(self, phno):
-        self.__phoneNumber = phno
-
-    def GetGender(self):
-        return self.__gender
-
-    def SetGender(self, gender):
-        self.__gender = gender
-
-    def getBloodGroup(self):
-        return self.__bloodGroup
-
-    def setBloodGroup(self, bgrp):
-        self.__bloodGroup = bgrp
 
 
 class Customer(User):
@@ -54,8 +22,8 @@ class Customer(User):
     __rUnits = None
     __Status = None
 
-    def __init__(self, cid, name, age, phno, gender, bgrp, status="None"):
-        super().__init__(name, age, phno, gender, bgrp)
+    def __init__(self, cid, name, status="None"):
+        super().__init__(name)
         self.__customerID = cid
         self.__dUnits = 0
         self.__rUnits = 0
@@ -97,8 +65,8 @@ class Staff(User):
     __acSample = None
     __rjSample = None
 
-    def __init__(self, staffid, name, age, phno, gender, bgrp):
-        super().__init__(name, age, phno, gender, bgrp)
+    def __init__(self, staffid, name):
+        super().__init__(name)
         self.__staffID = staffid
         self.__acSample = 0
         self.__rjSample = 0
@@ -128,8 +96,8 @@ class Requester(Customer):
     __reqUnits = None
     __sm = None
 
-    def __init__(self, cid, name, age, phno, gender, bgrp,reqbgrp,requ,smobj):
-        super().__init__(cid, name, age, phno, gender, bgrp)
+    def __init__(self, cid, name,reqbgrp,requ,smobj):
+        super().__init__(cid, name)
         self.__reqUnits = requ
         self.__reqBloodGroup = reqbgrp
         self.__sm = smobj
@@ -184,8 +152,8 @@ class Donor(Customer):
     __donBloodGroup = None
     __donUnits = None
 
-    def __init__(self, cid, name, age, phno, gender, bgrp, donbgrp, donu):
-        super().__init__(cid, name, age, phno, gender, bgrp)
+    def __init__(self, cid, name,  donbgrp, donu):
+        super().__init__(cid, name)
         self.__donUnits = donu
         self.__donBloodGroup = donbgrp
 
@@ -380,15 +348,27 @@ class BloodUnit:
 class UserManagement:
     __CustList = []
     __StaffList = []
-    __currUserRole = None
-    __currUserID = None
-    # __currUserPswd = None
 
-    def __init__(self, custs, staffs, curRole, curID):
-        self.__CustList = custs
-        self.__StaffList = staffs
-        self.__currUserID = curID
-        self.__currUserRole = curRole
+    def __init__(self):
+        self.__CustList=self.loadcustomerList()
+        self.__StaffList=self.loadstafflist()
+
+    def loadstafflist(self):
+        with open('database/StaffData.csv')as s:
+            reader = csv.DictReader(s)
+            for row in reader:
+                temp = Staff(row["ID"], row["NAME"])
+                temp.setStaffID()
+            return temp
+
+    def loadcustomerList(self):
+        with open('database/CustomerData.csv')as s:
+            reader = csv.DictReader(s)
+            for row in reader:
+                temp = copy.deepcopy(row)
+
+            return temp
+
 
     def getCustomerList(self):
         return self.__CustList
@@ -424,26 +404,117 @@ class UserManagement:
                     break
         return usr
 
-    def register(self, name, age, phno, gender, bgrp):
+    def register(self, name):
+
         cid = len(self.__CustList) + 1
-        c = Customer(cid, name, age, phno, gender, bgrp)
+        c = Customer(cid, name)
         self.addCustomerToList(c)
+        print(
+            "Hi {0}, You have been succesfully registered to our Blood Bank. Please use the below user ID to login to "
+            "our system.\n\tUser ID: {1}".format(name, cid))
+
         return
+
+    def __del__(self):
+        with open('database/CustomerData.csv', 'w') as s:
+            fieldnames = ["ID", "NAME", "DONATED_UNITS", "REQUESTED_UNITS", "STATUS"]
+            writer = csv.writer(s)
+            writer.writerow(fieldnames)
+
+            for j in self.__CustList:
+                # print(i)
+                writer.writerow(j.getCustomerId(),j.getName(),j.getDonatedUnits(),j.getPastRequestedunits(),j.getStatus())
+
+        with open('database/StaffData.csv', 'w') as s:
+            fieldnames = ["ID", "NAME", "ACCEPTED_UNITS", "REJECTED_UNITS"]
+            writer = csv.writer(s)
+            writer.writerow(fieldnames)
+
+            for j in self.__StaffList:
+                # print(i)
+                writer.writerow(j.getStaffId(),j.getName() ,j.getAcceptedSampleCount(),j.getRejectedSampleCount())
 
 
 class BloodBank:
 
+    __UserManagement = None
+    __StockManagement = None
+    __CustList = None
+    __Stafflist = None
+    __requester = None
+    __donor = None
+
     def __init__(self):
         self.Stk = StockManagement()
-        self.Stk.creditUnits('AB-',10)
+        self.user = UserManagement()
+
 
     def requestBlood(self):
 
-        Rq = Requester(23, "Nishkarsh", 26, 9876543210, "Male", "A+", "O-", 2, self.Stk)
-        Rq.request()
+        self.Rq.request()
+
+    def donateBlood(self):
+        pass
+
+    def login(self):
+
+
+        print("SALUTATION TO MY LORD!!")
+
+        inp = int(input("Are you \n\t1. Customer\n\t2. Staff\n"
+                        "Make your choice: "))
+
+
+        if inp==1:
+            inp2 = int(input("Please Enter your id :"))
+            self.user.login("Customer",inp2)
+        elif inp == 2:
+            inp2 = int(input("Please Enter your id :"))
+            self.user.login("Staff",inp2)
+        else:
+            print("Please Login again and Enter a valid Role")
+            return
+
+
+    def register(self):
+
+        print("Noob DETECTED!!")
+        name = input("Please enter your name: ")
+        self.user.register(name)
+
+    def printStockDetails(self):
+        pass
+
+    def printCustomerList(self):
+        pass
+
+    def printStafflist(self):
+        pass
+
+    # def
 
 
 if __name__ == "__main__":
-    bb=BloodBank()
-    # print(bb.Stk.stockDetails())
-    bb.requestBlood()
+    bb = BloodBank()
+
+    def exitSystem():
+        print("Thank you for visiting our Blood Bank,  Keep Donating!\nKyunki...\n"
+              "Boond boond se hi Sagar banta hai!")
+        exit(0)
+
+
+    print("########################################################################################"
+          "\n\t\t\t\t\t!Welcome to S&N's International Blood Bank!\n"
+          "########################################################################################")
+    while True:
+        switcher = {
+            1: bb.login,
+            2: bb.register,
+            0: exitSystem
+        }
+        inp = int(input("Are you...\n\t1. Existing User\n\t2. New User\n\t0. Exit"
+                        "\nMake your Choice: "))
+        func = switcher.get(inp, lambda: "enter valid input")
+        func()
+
+
