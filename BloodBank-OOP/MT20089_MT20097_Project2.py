@@ -54,7 +54,7 @@ class Customer(User):
     __rUnits = None
     __Status = None
 
-    def __init__(self, cid, name, age, phno, gender, bgrp,status="None"):
+    def __init__(self, cid, name, age, phno, gender, bgrp, status="None"):
         super().__init__(name, age, phno, gender, bgrp)
         self.__customerID = cid
         self.__dUnits = 0
@@ -84,6 +84,12 @@ class Customer(User):
             return self.__dUnits - self.__rUnits
         else:
             return 0
+
+    def getStatus(self):
+        return self.__Status
+
+    def setStatus(self, s):
+        self.__Status = s
 
 
 class Staff(User):
@@ -176,12 +182,12 @@ class Requester(Customer):
 class Donor(Customer):
 
     __donBloodGroup = None
-    __donUnits=None
+    __donUnits = None
 
-    def __init__(self, cid, name, age, phno, gender, bgrp,donbgrp,donu):
+    def __init__(self, cid, name, age, phno, gender, bgrp, donbgrp, donu):
         super().__init__(cid, name, age, phno, gender, bgrp)
-        self.__donUnits=donu
-        self.__donBloodGroup=donbgrp
+        self.__donUnits = donu
+        self.__donBloodGroup = donbgrp
 
     def getDonUnits(self):
         return self.__donUnits
@@ -196,76 +202,50 @@ class Donor(Customer):
         self.__donBloodGroup = bgrp
 
     def donate(self):
-        BT.testBlood()
 
-        BloodUnits = []
-        error_units = []
-        Users = []
-        i = 0
-        with open("database/UserData.csv") as ud:
-            reader = csv.DictReader(ud)
-            for row in reader:
-                Users.append(copy.deepcopy(row))
+        if self.getStatus() == "blacklisted":
+            print(
+                "Due to an incurable disease in your blood, you have been barred from donating blood\n You may continue "
+                "to request blood from our blood bank in the future.")
+            return
+        # temp = int(input("Enter no. of units you want to donate : "))
+        # blood_group = input("Enter your blood group : ")
+        acceptableBGroups = []
+        with open('database/AcceptableBloodGroups.csv')as s:
+            bgs = list(csv.reader(s))
+            for bg in bgs:
+                acceptableBGroups.append(bg)
 
-        with open("database/BloodUnits.csv") as bu:
-            reader = csv.DictReader(bu)
-            for row in reader:
-                i += 1
-                # BloodUnits.append(copy.deepcopy(row))
-                if row["TESTED"] == "TRUE":
-                    if row["STATUS"] == "accepted":
-                        userFound = False
-                        for u in Users:
-                            if u["ID"] == row["DONOR_ID"]:
-                                userFound = True
-                                u["DONATED_UNITS"] = "{}".format(int(u["DONATED_UNITS"]) + int(row["UNIT_COUNT"]))
-                                curr_staff["ACCEPTED_UNITS"] = "{}".format(int(curr_staff["ACCEPTED_UNITS"]) + 1)
-                                break
-                        if not userFound:
-                            error_units.append(i)
-                            print("Donor_id mismatch!\n"
-                                  "The Donor ID {} mapped to the blood units was not found in the user DB.".format(
-                                row["DONOR_ID"]))
-                    else:
-                        userFound = False
-                        for u in Users:
-                            if u["ID"] == row["DONOR_ID"]:
-                                userFound = True
-                                if row["STATUS"] == "rejected":
-                                    u["STATUS"] = "inactive"
-                                elif row["STATUS"] == "blacklisted":
-                                    u["STATUS"] = "blacklisted"
-                                else:
-                                    error_units.append(i)
-                                    print("Unknown Status of Blood unit detected!\nPlease rectify the status of Blood "
-                                          "unit in DB.")
-                                    row["TESTED"] = "FALSE"
-                                    break
-                                curr_staff["REJECTED_UNITS"] = "{}".format(int(curr_staff["REJECTED_UNITS"]) + 1)
-                                break
-                        if not userFound:
-                            error_units.append(i)
-                            print("Donor_id mismatch!\n"
-                                  "The Donor ID {} mapped to the blood units was not found in the user DB.".format(
-                                row["DONOR_ID"]))
-                BloodUnits.append(copy.deepcopy(row))
-
-        with open('database/UserData.csv', 'w') as s:
-            fieldnames = ["ID", "NAME", "DONATED_UNITS", "REQUESTED_UNITS", "STATUS"]
-            writer = csv.DictWriter(s, fieldnames=fieldnames)
-            writer.writeheader()
-            for j in Users:
-                writer.writerow(j)
-
-        i = 0
-        with open('database/BloodUnits.csv', 'w') as s:
-            fieldnames = ["DONOR_ID", "BLOOD_GROUP", "UNIT_COUNT", "TESTED", "STATUS"]
-            writer = csv.DictWriter(s, fieldnames=fieldnames)
-            writer.writeheader()
-            for j in BloodUnits:
-                i += 1
-                if i in error_units or j["TESTED"] == "FALSE":
-                    writer.writerow(j)
+        if not self.getDonBloodGroup() in acceptableBGroups:
+            print("This Blood Group is currently not being accepted by human race .\nWhen the aliens arrive"
+                  " we will let you know")
+            return
+        bu = BloodUnit(self.getCustomerId(), self.__donBloodGroup, self.__donUnits)
+        return bu
+        # Donated_blood = {
+        #     'DONOR_ID': current_user["ID"],
+        #     'BLOOD_GROUP': blood_group,
+        #     'UNIT_COUNT': temp,
+        #     'TESTED': "FALSE",
+        #     'STATUS': "None"
+        # }
+        # with open("database/BloodUnits.csv") as bu:
+        #     reader = csv.DictReader(bu)
+        #     BloodUnits = []
+        #     for row in reader:
+        #         BloodUnits.append(copy.deepcopy(row))
+        #
+        # BloodUnits.append(Donated_blood)
+        #
+        # with open('database/BloodUnits.csv', 'w') as s:
+        #     fieldnames = ["DONOR_ID", "BLOOD_GROUP", "UNIT_COUNT", "TESTED", "STATUS"]
+        #     writer = csv.DictWriter(s, fieldnames=fieldnames)
+        #     writer.writeheader()
+        #     for i in BloodUnits:
+        #         # print(i)
+        #         writer.writerow(i)
+        #
+        # print("Your sample has been collected,once the blood test is done if accepted then reflect in your account")
 
 
 # class BloodTester(Staff):
@@ -353,6 +333,104 @@ class Payment:
         return paymentSuccess
 
 
+class BloodUnit:
+    __donorID = None
+    __bloodGroup = None
+    __unitCount = None
+    __tested = None
+    __status = None
+
+    def __init__(self, did, bgrp, ucount):
+        self.__donorID = did
+        self.__bloodGroup = bgrp
+        self.__unitCount = ucount
+        self.__tested = False
+
+    def getBloodGroup(self):
+        return self.__bloodGroup
+
+    def setBloodGroup(self, bgrp):
+        self.__bloodGroup = bgrp
+
+    def getDonorID(self):
+        return self.__donorID
+
+    def setDonorID(self, id):
+        self.__donorID = id
+
+    def getUnitCount(self):
+        return self.__unitCount
+
+    def setUnitCount(self, uc):
+        self.__unitCount = uc
+
+    def getTested(self):
+        return self.__tested
+
+    def setTested(self, tested):
+        self.__tested = tested
+
+    def getStatus(self):
+        return self.__status
+
+    def setStatus(self, st):
+        self.__status = st
+
+
+class UserManagement:
+    __CustList = []
+    __StaffList = []
+    __currUserRole = None
+    __currUserID = None
+    # __currUserPswd = None
+
+    def __init__(self, custs, staffs, curRole, curID):
+        self.__CustList = custs
+        self.__StaffList = staffs
+        self.__currUserID = curID
+        self.__currUserRole = curRole
+
+    def getCustomerList(self):
+        return self.__CustList
+
+    def addCustomerToList(self, cust):
+        self.__CustList.append(cust)
+
+    def removeCustomerFromList(self, cust):
+        if cust in self.__CustList:
+            self.__CustList.remove(cust)
+
+    def getStaffList(self):
+        return self.__StaffList
+
+    def addStaffToList(self, staff):
+        self.__StaffList.append(staff)
+
+    def removeStaffFromList(self, staff):
+        if staff in self.__StaffList:
+            self.__StaffList.remove(staff)
+
+    def login(self, usrRole, usrID):
+        usr = None
+        if usrRole == "Customer":
+            for c in self.__CustList:
+                if c.getCustomerId() == usrID:
+                    usr = c
+                    break
+        else:
+            for s in self.__StaffList:
+                if s.getStaffID() == usrID:
+                    usr = s
+                    break
+        return usr
+
+    def register(self, name, age, phno, gender, bgrp):
+        cid = len(self.__CustList) + 1
+        c = Customer(cid, name, age, phno, gender, bgrp)
+        self.addCustomerToList(c)
+        return
+
+
 class BloodBank:
 
     def __init__(self):
@@ -361,12 +439,11 @@ class BloodBank:
 
     def requestBlood(self):
 
-        Rq=Requester(23,"Nishkarsh",26,9876543210,"Male","A+","O-",2,self.Stk)
+        Rq = Requester(23, "Nishkarsh", 26, 9876543210, "Male", "A+", "O-", 2, self.Stk)
         Rq.request()
 
 
-
-if __name__=="__main__":
+if __name__ == "__main__":
     bb=BloodBank()
     # print(bb.Stk.stockDetails())
     bb.requestBlood()
