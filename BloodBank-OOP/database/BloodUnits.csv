@@ -1,1 +1,6 @@
 DONOR_ID,BLOOD_GROUP,UNIT_COUNT,TESTED,STATUS
+3,A+,4,True,accepted
+1,A+,4,True,accepted
+2,A+,4,False,None
+4,A+,4,False,None
+2,A+,4,False,None

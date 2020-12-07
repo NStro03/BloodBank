@@ -148,7 +148,7 @@ class Requester(Customer):
                 if not pay_status:
                     print("payment unsuccessful.\nPlease make request again")
                     return
-                x = (int(self.getPastRequestedunits()) + self.__reqUnits)
+                x = (int(self.getPastRequestedunits()) + free_units)
                 self.setCurrentRequestedUnits(x)
                 print("Payment success")
                 self.__sm.DebitUnits(self.__reqBloodGroup, self.__reqUnits)
@@ -227,13 +227,63 @@ class Donor(Customer):
         # print("Your sample has been collected,once the blood test is done if accepted then reflect in your account")
 
 
-# class BloodTester(Staff):
-#
-#     __bloodUnitsToTest=[]
-#     __UpdatedCustomerStatus=None
-#     __userObjects=[]
-#
-#     def __init__(self,staffid, name, age, phno, gender, bgrp,):
+class BloodTester(Staff):
+
+
+    def __init__(self,staffid, name):
+        super().__init__(staffid,name)
+
+    def test(self,BloodUnits,custList,stk):
+
+        found = False
+        for i in BloodUnits:
+            if i.getTested() == "False":
+                found = True
+                print("Blood Test in progress...\n")
+                i.setStatus(input("Please enter the result of blood test (accepted/rejected/blacklisted): "))
+                i.setTested("True")
+                x = i.getStatus()
+                if x == "accepted":
+                    stk.creditUnits(i.getBloodGroup(), i.getUnitCount())
+                    self.acceptblood(i, custList)
+                else:
+                    self.rejectblood(i, custList)
+                break
+
+
+
+        if not found:
+            print("No Blood units left to test. Enjoy your day in cafeteria!")
+            return
+
+    def acceptblood(self,i,custList):
+        # print('acc')
+        for c in custList:
+
+            if c.getCustomerId() == i.getDonorID():
+                # print(c.getCustomerId())
+                c.setStatus("active")
+                c.setDonatedUnits(c.getDonatedUnits() + i.getUnitCount())
+                # print(self.getAcceptedSampleCount())
+                self.incrementAcceptedSampleCount()
+                # print(self.getAcceptedSampleCount())
+
+                break
+
+
+
+    def rejectblood(self,i,custList):
+        for c in custList:
+            if c.getCustomerId() == i.getDonorID():
+                if i.getStatus() == "rejected":
+                    c.setStatus("inactive")
+
+                elif i.getStatus() == "blacklisted":
+                    c.setStatus("blacklist")
+                self.incrementRejectedSampleCount()
+                break
+
+
 
 
 class StockManagement:
@@ -314,13 +364,13 @@ class BloodUnit:
     __bloodGroup = None
     __unitCount = None
     __tested = None
-    __status = None
+    __status = "None"
 
     def __init__(self, did, bgrp, ucount):
         self.__donorID = did
         self.__bloodGroup = bgrp
         self.__unitCount = ucount
-        self.__tested = False
+        self.__tested = "False"
 
     def getBloodGroup(self):
         return self.__bloodGroup
@@ -365,10 +415,14 @@ class UserManagement:
         with open('database/StaffData.csv')as s:
             reader = csv.DictReader(s)
             for row in reader:
-                temp = Staff(int(row["ID"]), row["NAME"])
-                temp.setAcceptedSampleCount(int(row["ACCEPTED_UNITS"]))
-                temp.setRejectedSampleCount(int(row["REJECTED_UNITS"]))
+                trow = copy.deepcopy(row)
+                temp = Staff(int(trow["ID"]), trow["NAME"])
+                temp.setAcceptedSampleCount(int(trow["ACCEPTED_UNITS"]))
+                temp.setRejectedSampleCount(int(trow["REJECTED_UNITS"]))
+                # print(trow)
+                # print(temp.getAcceptedSampleCount())
                 self.addStaffToList(temp)
+
 
     def loadcustomerList(self):
         with open('database/CustomerData.csv')as s:
@@ -418,8 +472,6 @@ class UserManagement:
                 if s.getStaffID() == usrID:
                     return s
 
-        print("User doesn't exist!!\n Enter a valid user id or Please register ")
-
     def register(self, name):
 
         cid = len(self.__CustList) + 1
@@ -464,9 +516,9 @@ class BloodBank:
             reader = csv.DictReader(s)
             for row in reader:
                 trow = copy.deepcopy(row)
-                temp = BloodUnit(int(trow["DONOR_ID"]), trow["BLOOD_GROUP"], trow["UNIT_COUNT"])
-                temp.setTested(int(trow["TESTED"]))
-                temp.setStatus(int(trow["STATUS"]))
+                temp = BloodUnit(int(trow["DONOR_ID"]), trow["BLOOD_GROUP"], int(trow["UNIT_COUNT"]))
+                temp.setTested((trow["TESTED"]))
+                temp.setStatus((trow["STATUS"]))
                 self.bloodUnits.append(temp)
 
     def requestBlood(self):
@@ -488,6 +540,17 @@ class BloodBank:
         self.bloodUnits.append(donatedBU)
         self.currentUser.setDonatedUnits(dn.getDonatedUnits())
 
+    def TestBlood(self):
+        bt = BloodTester(self.currentUser.getStaffID(),self.currentUser.getName())
+        bt.setRejectedSampleCount(self.currentUser.getRejectedSampleCount())
+        bt.setAcceptedSampleCount(self.currentUser.getAcceptedSampleCount())
+        # print(bt.getAcceptedSampleCount())
+        bt.test(self.bloodUnits,self.user.getCustomerList(),self.Stk)
+        # print(bt.getAcceptedSampleCount())
+
+        self.currentUser.setAcceptedSampleCount(bt.getAcceptedSampleCount())
+        self.currentUser.setRejectedSampleCount(bt.getRejectedSampleCount())
+
     def login(self):
         print("SALUTATION TO MY LORD!!")
 
@@ -498,12 +561,19 @@ class BloodBank:
             inp2 = int(input("Please Enter your id :"))
             self.currentUser = self.user.login("Customer", inp2)
         elif inp == 2:
-            inp2 = int(input("Please Enter your id :"))
+            inp2 = int(input("Please enter your Employee ID: "))
             self.currentUser = self.user.login("Staff", inp2)
         else:
             print("Please Login again and Enter a valid Role")
             return None
 
+        if self.currentUser is None and inp == 1:
+            print("User doesn't exist!!\n Enter a valid user id or Please register ")
+            return
+        elif self.currentUser is None and inp == 2:
+            print("User doesn't exist!!\nEnter a valid user ID or Contact Admin.")
+
+            return
         print("Welcome {}".format(self.currentUser.getName()))
         # print("D: ", self.currentUser.getDonatedUnits(), "\tR: ", self.currentUser.getPastRequestedunits())
 
@@ -520,12 +590,26 @@ class BloodBank:
 
                 func = switcher.get(cinp, lambda: "Enter valid input")
                 func()
-            # else:
+            else:
+
+                # print("Welcome {}".format(self.currentUser.getName()))
+
+                # while True:
+                switcher = {
+                    1: self.TestBlood,
+                }
+                cinp = int(input("What do you want to do :\n\t1. Test Blood\n\t0. Logout\n"
+                                "Make your choice: "))
+                if cinp == 0:
+                    break
+
+                func = switcher.get(cinp, lambda: "enter valid input")
+                func()
+
         self.saveAndExit()
 
     def saveAndExit(self):
-        # TODO Save and Exit fr BloodUnits and Staff flow.
-        print(self.user.getCustomerList())
+
         with open('database/CustomerData.csv', 'w') as s:
             fieldnames = ["ID", "NAME", "DONATED_UNITS", "REQUESTED_UNITS", "STATUS"]
 
@@ -567,6 +651,30 @@ class BloodBank:
                 temp["ACCEPTED_UNITS"] = j.getAcceptedSampleCount()
                 temp["REJECTED_UNITS"] = j.getRejectedSampleCount()
                 writer.writerow(temp)
+
+        with open('database/BloodUnits.csv', 'w') as s:
+            fieldnames = ["DONOR_ID", "BLOOD_GROUP", "UNIT_COUNT", "TESTED", "STATUS"]
+            bldtemplate = {
+                "DONOR_ID": None,
+                "BLOOD_GROUP": None,
+                "UNIT_COUNT": None,
+                "TESTED": None,
+                "STATUS": None
+            }
+            writer = csv.DictWriter(s, fieldnames=fieldnames)
+            writer.writeheader()
+            for j in self.bloodUnits:
+
+                temp = copy.deepcopy(bldtemplate)
+                temp["DONOR_ID"] = j.getDonorID()
+                temp["BLOOD_GROUP"] = j.getBloodGroup()
+                temp["UNIT_COUNT"] = j.getUnitCount()
+                temp["TESTED"] = j.getTested()
+                temp["STATUS"] = j.getStatus()
+
+                writer.writerow(temp)
+        return
+
 
     def register(self):
 
