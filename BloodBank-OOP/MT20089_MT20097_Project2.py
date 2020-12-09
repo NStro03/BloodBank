@@ -194,6 +194,8 @@ class Donor(Customer):
             for bg in bgs[0]:
                 acceptableBGroups.append(bg)
 
+        print("Your sample has been collected,once the blood test is done if accepted then reflect in your account")
+
         # print(acceptableBGroups)
         if not self.getDonBloodGroup() in acceptableBGroups:
             print("This Blood Group is currently not being accepted by human race .\nWhen the aliens arrive"
